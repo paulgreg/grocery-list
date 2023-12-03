@@ -47,8 +47,13 @@ const ItemForm: React.FC<AddItemProps> = ({ item, onSubmitItem }) => {
                     <option
                         key={c}
                         value={c}
-                        style={{ color: c, backgroundColor: c }}
-                    ></option>
+                        style={{
+                            color: c,
+                            backgroundColor: c,
+                        }}
+                    >
+                        {c}
+                    </option>
                 ))}
             </select>
             <button>Add</button>
