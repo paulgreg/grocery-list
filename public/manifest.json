@@ -1,0 +1,30 @@
+{
+    "name": "Grocery List",
+    "short_name": "GL",
+    "icons": [
+        {
+            "src": "list-128.png",
+            "type": "image/png",
+            "sizes": "128x128 64x64 32x32 24x24 16x16"
+        },
+        {
+            "src": "list-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "list-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "list.svg",
+            "sizes": "any",
+            "type": "image/svg"
+        }
+    ],
+    "start_url": "./",
+    "display": "standalone",
+    "theme_color": "#fc7c9f",
+    "background_color": "#6c2e6d"
+}
