@@ -42,10 +42,12 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
     )
 
     const onDeleteClick = useCallback(
-        (id: string) => (e: MouseEvent) => {
+        (id: string, name: string) => (e: MouseEvent) => {
             e.stopPropagation()
-            const newList = list.filter((item) => item.id !== id)
-            setList(newList)
+            if (confirm(`Delete ${name} ?`)) {
+                const newList = list.filter((item) => item.id !== id)
+                setList(newList)
+            }
         },
         [list, setList]
     )
@@ -96,7 +98,7 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                         />
                         <DeleteIcon
                             className="icon"
-                            onClick={onDeleteClick(item.id)}
+                            onClick={onDeleteClick(item.id, item.name)}
                             style={{
                                 fill: 'grey',
                             }}

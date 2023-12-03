@@ -2,16 +2,16 @@ import { FormEvent, useEffect, useCallback, useState } from 'react'
 import { COLORS } from '../constants'
 import { GroceryItem } from '../types'
 
-type AddItemProps = {
+type FormItemProps = {
     item?: GroceryItem
     onSubmitItem: (itemName: string, color: string) => void
 }
 
-const ItemForm: React.FC<AddItemProps> = ({ item, onSubmitItem }) => {
+const ItemForm: React.FC<FormItemProps> = ({ item, onSubmitItem }) => {
     const [itemName, setItemName] = useState('')
     const [color, setColor] = useState(COLORS[0])
 
-    const onSubmitAddForm = useCallback(
+    const onSubmitItemForm = useCallback(
         (e: FormEvent) => {
             e.preventDefault()
             onSubmitItem(itemName, color)
@@ -27,7 +27,7 @@ const ItemForm: React.FC<AddItemProps> = ({ item, onSubmitItem }) => {
         }
     }, [item])
     return (
-        <form className="ItemForm" onSubmit={onSubmitAddForm}>
+        <form className="ItemForm" onSubmit={onSubmitItemForm}>
             <input
                 type="text"
                 placeholder="item"
@@ -56,7 +56,7 @@ const ItemForm: React.FC<AddItemProps> = ({ item, onSubmitItem }) => {
                     </option>
                 ))}
             </select>
-            <button>Add</button>
+            <button>save</button>
         </form>
     )
 }
