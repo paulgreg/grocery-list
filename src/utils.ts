@@ -21,9 +21,11 @@ export const debounce = <T extends (...args: any[]) => any>(
 
 export const slugify = (s: string) =>
     s
-        .trim()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
         .replace(/[^\w\s]/g, '') // Replace non-alphanumeric characters with empty string
         .replace(/\s+/g, '-') // Replace spaces with dashes
+        .trim()
 
 export const generateShortUID = () => {
     const timestamp = new Date().getTime()
