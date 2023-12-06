@@ -31,7 +31,7 @@ const App = () => {
                 })
                 .catch((e) => {
                     console.error(e)
-                    alert('error while loading json')
+                    alert('error while loading data')
                 }),
         []
     )
@@ -55,7 +55,7 @@ const App = () => {
 
     const save = useCallback((slugListName: string, list: GroceryItems) => {
         localStorage.setItem(`${PREFIX}-${slugListName}`, JSON.stringify(list))
-        if (settings.saveOnline) {
+        if (settings.saveOnline && navigator.onLine) {
             const key = `${PREFIX}-${slugListName}`
             if (key) saveOnline(key, list)
         }
