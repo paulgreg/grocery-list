@@ -85,7 +85,7 @@ const Home: React.FC<HomeProps> = ({ onSubmitListName }) => {
                     required
                     autoFocus
                     minLength={2}
-                    maxLength={10}
+                    maxLength={20}
                     value={listName}
                     onChange={(e) => setListName(e.target.value)}
                 ></input>
