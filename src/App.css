@@ -2,6 +2,15 @@
     padding: 1rem;
 }
 
+header {
+    display: flex;
+    place-content: space-between;
+}
+
+.homeIcon {
+    margin: 0.6em 0.6em 0.1em 0.1em;
+}
+
 .ListNameForm {
     display: flex;
     padding: 0.5em 0;
@@ -56,4 +65,9 @@
 
 .item .icon {
     padding: 0.25em;
+}
+
+.unckeckAll {
+    display: flex;
+    margin: auto;
 }

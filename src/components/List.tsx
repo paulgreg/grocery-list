@@ -4,6 +4,7 @@ import { generateShortUID, sortList } from '../utils'
 import ItemForm from './ItemForm'
 import DeleteIcon from '../assets/close.svg?react'
 import EditIcon from '../assets/pen_1.svg?react'
+import HomeIcon from '../assets/home.svg?react'
 
 type ListProps = {
     listName: string
@@ -13,6 +14,7 @@ type ListProps = {
 
 const List: React.FC<ListProps> = ({ listName, list, setList }) => {
     const [editItem, setEditItem] = useState<GroceryItem | undefined>(undefined)
+    const disableUncheck = !list.some((item) => item.checked)
 
     const onSubmitListName = useCallback(
         (itemName: string, color: string) => {
@@ -63,9 +65,30 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
         [list, setList]
     )
 
+    const onUncheckAllClick = useCallback(
+        (e: MouseEvent) => {
+            e.stopPropagation()
+            const newList = list
+                .map((item) => ({ ...item, checked: false }))
+                .sort(sortList)
+            setList(newList)
+        },
+        [list, setList]
+    )
+
     return (
         <>
-            <h1>{listName}</h1>
+            <header>
+                <h1>{listName}</h1>
+                <a href="./" title="back to home" className="homeIcon">
+                    <HomeIcon
+                        className="icon"
+                        style={{
+                            fill: 'grey',
+                        }}
+                    />
+                </a>
+            </header>
             <ItemForm item={editItem} onSubmitItem={onSubmitListName} />
             <ul className="items">
                 {list.map((item) => (
@@ -106,6 +129,15 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                     </li>
                 ))}
             </ul>
+            <p>
+                <button
+                    className="unckeckAll"
+                    disabled={disableUncheck}
+                    onClick={onUncheckAllClick}
+                >
+                    Uncheck all
+                </button>
+            </p>
         </>
     )
 }
