@@ -1,6 +1,6 @@
 {
     "name": "Grocery List",
-    "short_name": "GL",
+    "short_name": "Grocery",
     "start_url": "./",
     "display": "standalone",
     "theme_color": "#fc7c9f",
