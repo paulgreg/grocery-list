@@ -1,6 +1,10 @@
 {
     "name": "Grocery List",
     "short_name": "GL",
+    "start_url": "./",
+    "display": "standalone",
+    "theme_color": "#fc7c9f",
+    "background_color": "#6c2e6d",
     "icons": [
         {
             "src": "basket-128.png",
@@ -22,9 +26,5 @@
             "sizes": "any",
             "type": "image/svg"
         }
-    ],
-    "start_url": "./",
-    "display": "standalone",
-    "theme_color": "#fc7c9f",
-    "background_color": "#6c2e6d"
+    ]
 }
