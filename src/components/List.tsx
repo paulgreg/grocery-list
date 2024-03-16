@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useState, useCallback } from 'react'
+import { ChangeEvent, MouseEvent, useState, useCallback, useRef } from 'react'
 import { GroceryItem, GroceryItems } from '../types'
 import { generateShortUID, sortList } from '../utils'
 import ItemForm from './ItemForm'
@@ -15,6 +15,7 @@ type ListProps = {
 const List: React.FC<ListProps> = ({ listName, list, setList }) => {
     const [editItem, setEditItem] = useState<GroceryItem | undefined>(undefined)
     const disableUncheck = !list.some((item) => item.checked)
+    const textInputRef = useRef<HTMLInputElement>(null)
 
     const onSubmitListName = useCallback(
         (itemName: string, color: string) => {
@@ -61,6 +62,8 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
             const newList = list.filter((item) => item.id !== id)
             setEditItem(item)
             setList(newList)
+            textInputRef.current?.scrollIntoView()
+            textInputRef.current?.focus()
         },
         [list, setList]
     )
@@ -89,7 +92,11 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                     />
                 </a>
             </header>
-            <ItemForm item={editItem} onSubmitItem={onSubmitListName} />
+            <ItemForm
+                item={editItem}
+                onSubmitItem={onSubmitListName}
+                ref={textInputRef}
+            />
             <ul className="items">
                 {list.map((item) => (
                     <li
