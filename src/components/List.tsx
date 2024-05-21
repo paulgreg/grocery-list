@@ -19,16 +19,25 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
 
     const onSubmitListName = useCallback(
         (itemName: string, color: string) => {
-            setEditItem(undefined)
-            const newList = list.concat({
-                id: generateShortUID(),
-                name: itemName,
-                checked: false,
-                color,
-            })
-            setList(newList.sort(sortList))
+            if (editItem) {
+                const newList = list.map((item) =>
+                    item.id === editItem.id
+                        ? { ...item, name: itemName, color }
+                        : item
+                )
+                setList(newList.sort(sortList))
+                setEditItem(undefined)
+            } else {
+                const newList = list.concat({
+                    id: generateShortUID(),
+                    name: itemName,
+                    checked: false,
+                    color,
+                })
+                setList(newList.sort(sortList))
+            }
         },
-        [list, setList]
+        [editItem, list, setList]
     )
 
     const onCheckChange = useCallback(
@@ -59,9 +68,7 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
         (id: string) => (e: MouseEvent) => {
             e.stopPropagation()
             const item = list.find((item) => item.id === id)
-            const newList = list.filter((item) => item.id !== id)
             setEditItem(item)
-            setList(newList)
             textInputRef.current?.scrollIntoView()
             textInputRef.current?.focus()
         },
