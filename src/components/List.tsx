@@ -16,6 +16,7 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
     const [editItem, setEditItem] = useState<GroceryItem | undefined>(undefined)
     const disableUncheck = !list.some((item) => item.checked)
     const textInputRef = useRef<HTMLInputElement>(null)
+    const [filter, setFilter] = useState('')
 
     const onSubmitListName = useCallback(
         (itemName: string, color: string) => {
@@ -68,7 +69,9 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
         (id: string) => (e: MouseEvent) => {
             e.stopPropagation()
             const item = list.find((item) => item.id === id)
+            if (!item) return
             setEditItem(item)
+            setFilter(item.name)
             textInputRef.current?.scrollIntoView()
             textInputRef.current?.focus()
         },
@@ -84,6 +87,14 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
             setList(newList)
         },
         [list, setList]
+    )
+
+    const onTyping = useCallback((v: string) => {
+        setFilter(v.toLocaleLowerCase())
+    }, [])
+
+    const filteredList = list.filter((item) =>
+        item.name.toLocaleLowerCase().includes(filter)
     )
 
     return (
@@ -102,10 +113,11 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
             <ItemForm
                 item={editItem}
                 onSubmitItem={onSubmitListName}
+                onTyping={onTyping}
                 ref={textInputRef}
             />
             <ul className="items">
-                {list.map((item) => (
+                {filteredList.map((item) => (
                     <li
                         key={item.id}
                         className={`item ${item.checked ? 'checked' : ''} `}
