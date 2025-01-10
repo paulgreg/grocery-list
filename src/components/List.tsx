@@ -155,15 +155,17 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                     </li>
                 ))}
             </ul>
-            <p>
-                <button
-                    className="unckeckAll"
-                    disabled={disableUncheck}
-                    onClick={onUncheckAllClick}
-                >
-                    Uncheck all
-                </button>
-            </p>
+            {filter === '' && (
+                <p>
+                    <button
+                        className="unckeckAll"
+                        disabled={disableUncheck}
+                        onClick={onUncheckAllClick}
+                    >
+                        Uncheck all
+                    </button>
+                </p>
+            )}
         </>
     )
 }
