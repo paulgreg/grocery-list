@@ -6,64 +6,88 @@ import { GroceryItems } from './types'
 import { debounce, slugify } from './utils'
 import { PREFIX } from './constants'
 import settings from './settings.json'
+import * as jsonpatch from 'fast-json-patch'
 
 const DEBOUNCE_SAVE_TIME = 1000
 
 const App = () => {
     const [listName, setListName] = useState('')
     const [list, setList] = useState<GroceryItems | null>(null)
+    const [newDoc, setNewDoc] = useState(true)
+    const [previousList, setPreviousList] = useState<GroceryItems | null>(null)
     const slugListName = slugify(listName ?? '')
 
-    const loadOnlineList = useCallback(
-        async (slugName: string) => {
-            if (!settings.saveOnline || !navigator.onLine) return
-            try {
-                const key = `${PREFIX}-${slugName}`
-                const response = await fetch(
-                    `${settings.saveUrl}/${key}.json`,
-                    {
-                        headers: {
-                            Authorization: `Basic ${settings.authorization}`,
-                        },
-                    }
-                )
-                const data = response.ok ? await response.json() : []
-                setList(data)
-            } catch (e) {
-                console.error(e)
-                alert('error while loading data')
-            }
-        },
-        [setList]
-    )
-
-    const saveOnlineList = useCallback(
-        debounce((slugListName: string, data: GroceryItems) => {
-            if (!settings.saveOnline || !navigator.onLine) return
-
-            const key = `${PREFIX}-${slugListName}`
-            return fetch(`${settings.saveUrl}/${key}.json`, {
-                method: 'POST',
-                mode: 'cors',
+    const loadOnlineList = useCallback(async (slugName: string) => {
+        if (!settings.saveOnline || !navigator.onLine) return
+        try {
+            const key = `${PREFIX}-${slugName}`
+            const response = await fetch(`${settings.saveUrl}/${key}.json`, {
                 headers: {
                     Authorization: `Basic ${settings.authorization}`,
-                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
             })
-        }, DEBOUNCE_SAVE_TIME),
+            if (response.ok) {
+                setNewDoc(false)
+                return await response.json()
+            }
+            return []
+        } catch (e) {
+            console.error(e)
+            alert('error while loading data')
+        }
+    }, [])
+
+    const saveOnlineList = useCallback(
+        debounce(
+            (
+                slugListName: string,
+                data: GroceryItems,
+                previousData: GroceryItems | null,
+                newDoc: boolean
+            ) => {
+                if (!settings.saveOnline || !navigator.onLine) return
+
+                const key = `${PREFIX}-${slugListName}`
+
+                let method
+                let bodyRaw
+                if (!newDoc && previousData) {
+                    method = 'PATCH'
+                    bodyRaw = jsonpatch.compare(previousData, data)
+                } else {
+                    method = 'POST'
+                    bodyRaw = data
+                }
+
+                return fetch(`${settings.saveUrl}/${key}.json`, {
+                    method,
+                    mode: 'cors',
+                    headers: {
+                        Authorization: `Basic ${settings.authorization}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bodyRaw),
+                }).then(() => {
+                    setPreviousList(data)
+                    setNewDoc(false)
+                })
+            },
+            DEBOUNCE_SAVE_TIME
+        ),
         []
     )
 
-    useEffect(() => {
-        if (list && list.length > 0) {
+    const setListAndPersist = useCallback(
+        (list: GroceryItems) => {
+            setList(list)
             localStorage.setItem(
                 `${PREFIX}-${slugListName}`,
                 JSON.stringify(list)
             )
-            saveOnlineList(slugListName, list)
-        }
-    }, [slugListName, list])
+            saveOnlineList(slugListName, list, previousList, newDoc)
+        },
+        [slugListName, previousList, newDoc]
+    )
 
     const onSubmitListName = useCallback(
         (name: string) => {
@@ -73,18 +97,21 @@ const App = () => {
     )
 
     useEffect(() => {
-        if (listName?.length > 0) {
-            setList(
-                JSON.parse(
-                    localStorage.getItem(`${PREFIX}-${slugListName}`) ?? '[]'
-                )
+        const load = async () => {
+            const serverList = await loadOnlineList(slugListName)
+            const localList = JSON.parse(
+                localStorage.getItem(`${PREFIX}-${slugListName}`) ?? '[]'
             )
-            loadOnlineList(slugListName)
+            setList(serverList ?? localList)
+            setPreviousList(serverList)
         }
+        if (listName?.length > 0) load()
     }, [listName, slugListName])
 
     if (list) {
-        return <List listName={listName} list={list} setList={setList} />
+        return (
+            <List listName={listName} list={list} setList={setListAndPersist} />
+        )
     }
 
     return <Home onSubmitListName={onSubmitListName} />
