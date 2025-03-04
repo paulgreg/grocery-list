@@ -35,8 +35,8 @@ const Home: React.FC<HomeProps> = ({ onSubmitListName }) => {
 
     useEffect(() => {
         const load = async () => setListNames(await loadListNames())
-        load()
-    }, [setListNames])
+        if (!listName) load()
+    }, [listName, setListNames])
 
     const addListNameOnline = useCallback(
         async (listName: string) => {
