@@ -26,7 +26,7 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                         ? { ...item, name: itemName, color }
                         : item
                 )
-                setList(newList.sort(sortList))
+                setList(newList.toSorted(sortList))
                 setEditItem(undefined)
             } else {
                 const newList = list.concat({
@@ -35,7 +35,7 @@ const List: React.FC<ListProps> = ({ listName, list, setList }) => {
                     checked: false,
                     color,
                 })
-                setList(newList.sort(sortList))
+                setList(newList.toSorted(sortList))
             }
         },
         [editItem, list, setList]
