@@ -1,24 +1,5 @@
 import { GroceryItem } from './types'
 
-type DebounceFunction<T extends (...args: any[]) => any> = (
-    ...args: Parameters<T>
-) => void
-
-export const debounce = <T extends (...args: any[]) => any>(
-    fn: T,
-    delay: number
-): DebounceFunction<T> => {
-    let timerId: ReturnType<typeof setTimeout>
-
-    return function (this: any, ...args: Parameters<T>) {
-        clearTimeout(timerId)
-
-        timerId = setTimeout(() => {
-            fn.apply(this, args)
-        }, delay)
-    }
-}
-
 export const slugify = (s: string) =>
     s
         .normalize('NFD')

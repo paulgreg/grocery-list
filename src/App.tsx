@@ -3,12 +3,10 @@ import { useCallback, useEffect, useState } from 'react'
 import Home from './components/Home'
 import List from './components/List'
 import { GroceryItems } from './types'
-import { debounce, slugify } from './utils'
+import { slugify } from './utils'
 import { PREFIX } from './constants'
 import settings from './settings.json'
 import * as jsonpatch from 'fast-json-patch'
-
-const DEBOUNCE_SAVE_TIME = 1000
 
 const App = () => {
     const [listName, setListName] = useState('')
@@ -38,42 +36,39 @@ const App = () => {
     }, [])
 
     const saveOnlineList = useCallback(
-        debounce(
-            (
-                slugListName: string,
-                data: GroceryItems,
-                previousData: GroceryItems | null,
-                newDoc: boolean
-            ) => {
-                if (!settings.saveOnline || !navigator.onLine) return
+        (
+            slugListName: string,
+            data: GroceryItems,
+            previousData: GroceryItems | null,
+            newDoc: boolean
+        ) => {
+            if (!settings.saveOnline || !navigator.onLine) return
 
-                const key = `${PREFIX}-${slugListName}`
+            const key = `${PREFIX}-${slugListName}`
 
-                let method
-                let bodyRaw
-                if (!newDoc && previousData) {
-                    method = 'PATCH'
-                    bodyRaw = jsonpatch.compare(previousData, data)
-                } else {
-                    method = 'POST'
-                    bodyRaw = data
-                }
+            let method
+            let bodyRaw
+            if (!newDoc && previousData) {
+                method = 'PATCH'
+                bodyRaw = jsonpatch.compare(previousData, data)
+            } else {
+                method = 'POST'
+                bodyRaw = data
+            }
 
-                return fetch(`${settings.saveUrl}/${key}.json`, {
-                    method,
-                    mode: 'cors',
-                    headers: {
-                        Authorization: `Basic ${settings.authorization}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(bodyRaw),
-                }).then(() => {
-                    setPreviousList(data)
-                    setNewDoc(false)
-                })
-            },
-            DEBOUNCE_SAVE_TIME
-        ),
+            setPreviousList(data)
+            setNewDoc(false)
+
+            return fetch(`${settings.saveUrl}/${key}.json`, {
+                method,
+                mode: 'cors',
+                headers: {
+                    Authorization: `Basic ${settings.authorization}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bodyRaw),
+            })
+        },
         []
     )
 
