@@ -11,7 +11,7 @@ import * as jsonpatch from 'fast-json-patch'
 const App = () => {
     const [listName, setListName] = useState('')
     const [list, setList] = useState<GroceryItems | null>(null)
-    const [newDoc, setNewDoc] = useState(true)
+    const [fullSave, setFullSave] = useState(true)
     const [previousList, setPreviousList] = useState<GroceryItems | null>(null)
     const slugListName = slugify(listName ?? '')
 
@@ -25,7 +25,7 @@ const App = () => {
                 },
             })
             if (response.ok) {
-                setNewDoc(false)
+                setFullSave(false)
                 return await response.json()
             }
             return []
@@ -40,7 +40,7 @@ const App = () => {
             slugListName: string,
             data: GroceryItems,
             previousData: GroceryItems | null,
-            newDoc: boolean
+            fullSave: boolean
         ) => {
             if (!settings.saveOnline || !navigator.onLine) return
 
@@ -48,7 +48,7 @@ const App = () => {
 
             let method
             let bodyRaw
-            if (!newDoc && previousData) {
+            if (!fullSave && previousData) {
                 method = 'PATCH'
                 bodyRaw = jsonpatch.compare(previousData, data)
             } else {
@@ -57,7 +57,9 @@ const App = () => {
             }
 
             setPreviousList(data)
-            setNewDoc(false)
+            setFullSave(true)
+
+            const body = JSON.stringify(bodyRaw)
 
             return fetch(`${settings.saveUrl}/${key}.json`, {
                 method,
@@ -66,8 +68,22 @@ const App = () => {
                     Authorization: `Basic ${settings.authorization}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(bodyRaw),
+                body,
             })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        )
+                    setFullSave(false)
+                })
+                .catch((e) => {
+                    console.error(e)
+                    alert(
+                        'An error occured. App will refresh data to avoid corruption.'
+                    )
+                    location.reload()
+                })
         },
         []
     )
@@ -79,9 +95,9 @@ const App = () => {
                 `${PREFIX}-${slugListName}`,
                 JSON.stringify(list)
             )
-            saveOnlineList(slugListName, list, previousList, newDoc)
+            saveOnlineList(slugListName, list, previousList, fullSave)
         },
-        [slugListName, previousList, newDoc]
+        [slugListName, previousList, fullSave]
     )
 
     const onSubmitListName = useCallback(
