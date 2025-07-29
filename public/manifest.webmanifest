@@ -4,7 +4,7 @@
     "start_url": "./",
     "display": "standalone",
     "theme_color": "#fc7c9f",
-    "background_color": "#6c2e6d",
+    "background_color": "#242424",
     "icons": [
         {
             "src": "basket-128.png",
@@ -20,11 +20,6 @@
             "src": "basket-512.png",
             "type": "image/png",
             "sizes": "512x512"
-        },
-        {
-            "src": "basket.svg",
-            "sizes": "any",
-            "type": "image/svg"
         }
     ]
 }
