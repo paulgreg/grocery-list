@@ -7,3 +7,26 @@
     flex-grow: 1;
     margin-right: 0.5em;
 }
+
+.list {
+    margin: auto 1em;
+}
+
+.listItem {
+    list-style: square;
+    margin: 1em auto;
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.listLink {
+    flex-grow: 1;
+    text-decoration: underline;
+}
+
+.button {
+    padding: 0 0.1em;
+}
