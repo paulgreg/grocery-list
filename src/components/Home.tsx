@@ -43,13 +43,15 @@ const Home = () => {
             e.preventDefault()
             const name = inputRef.current?.value ?? ''
             if (name) {
-                if (!listNames.includes(name)) {
-                    yListNames.insert(0, [name])
+                const idx = yListNames.toArray().findIndex((n) => n === name)
+                if (idx !== -1) {
+                    yListNames.delete(idx)
                 }
+                yListNames.insert(0, [name])
                 navigate(`/list/${name}`)
             }
         },
-        [listNames, navigate, yListNames]
+        [navigate, yListNames]
     )
     const onDeleteList = useCallback(
         (name: string) => (e: MouseEvent) => {

@@ -6,7 +6,7 @@ import { WebsocketProvider } from 'y-websocket'
 import settings from './settings.json'
 import { GroceryItem, GroceryItems } from './types'
 import { useY } from 'react-yjs'
-import { sortList } from './utils'
+import { slugify, sortList } from './utils'
 import { DataContext } from './DataContext'
 
 interface DataContextProviderPropsType {
@@ -18,7 +18,7 @@ const DataContextProvider: React.FC<DataContextProviderPropsType> = ({
     listName,
     children,
 }) => {
-    const guid = `${PREFIX}:${listName}`
+    const guid = `${PREFIX}:${slugify(listName)}`
 
     const yDoc = useMemo(() => new Y.Doc({ guid }), [guid])
     const yItems = yDoc.getArray<Y.Map<string | boolean>>(`items`)
