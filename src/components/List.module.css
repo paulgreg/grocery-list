@@ -1,0 +1,12 @@
+.homeIcon {
+    margin: 0.6em 0.6em 0.1em 0.1em;
+}
+
+.items {
+    padding: 1em 0;
+}
+
+.unckeckAll {
+    display: flex;
+    margin: auto;
+}

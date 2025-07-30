@@ -15,7 +15,9 @@ export const generateShortUID = () => {
     return uid
 }
 export const sortList = (a: GroceryItem, b: GroceryItem) => {
-    if (a.checked && !b.checked) return 1
-    if (!a.checked && b.checked) return -1
+    const aChecked = a.checked
+    const bChecked = b.checked
+    if (aChecked && !bChecked) return 1
+    if (!aChecked && bChecked) return -1
     return a.color.localeCompare(b.color)
 }

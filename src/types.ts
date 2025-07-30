@@ -5,3 +5,7 @@ export type GroceryItem = {
     color: string
 }
 export type GroceryItems = Array<GroceryItem>
+
+export type YGroceryItem = Map<string, string | boolean>
+
+export type YGroceryItems = Array<YGroceryItem>

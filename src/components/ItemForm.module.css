@@ -1,0 +1,16 @@
+.ItemForm {
+    display: flex;
+    padding: 0.5em 0;
+}
+
+.ItemFormInput {
+    flex-grow: 1;
+    margin-right: 0.5em;
+}
+.ItemFormButton {
+    margin-left: 0.5em;
+}
+
+.colorChooser {
+    width: 60px;
+}

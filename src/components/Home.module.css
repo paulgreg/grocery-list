@@ -1,0 +1,9 @@
+.ListNameForm {
+    display: flex;
+    padding: 0.5em 0;
+}
+
+.ListNameFormInput {
+    flex-grow: 1;
+    margin-right: 0.5em;
+}

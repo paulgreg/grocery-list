@@ -74,3 +74,8 @@ ul {
     list-style: none;
     padding: 0;
 }
+
+header {
+    display: flex;
+    place-content: space-between;
+}

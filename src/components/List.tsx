@@ -1,164 +1,104 @@
-import { ChangeEvent, MouseEvent, useState, useCallback, useRef } from 'react'
-import { GroceryItem, GroceryItems } from '../types'
-import { generateShortUID, sortList } from '../utils'
+import s from './List.module.css'
+import { MouseEvent, useState, useCallback, useRef } from 'react'
+import { GroceryItem } from '../types'
+import { generateShortUID } from '../utils'
 import ItemForm from './ItemForm'
-import DeleteIcon from '../assets/close.svg?react'
-import EditIcon from '../assets/pen_1.svg?react'
 import HomeIcon from '../assets/home.svg?react'
+import { useDataContext } from '../DataContext'
+import { Link } from 'react-router-dom'
+import ListItem from './ListItem'
 
 type ListProps = {
     listName: string
-    list: GroceryItems
-    setList: (items: GroceryItems) => void
 }
 
-const List: React.FC<ListProps> = ({ listName, list, setList }) => {
+const List: React.FC<ListProps> = ({ listName }) => {
+    const { items, addItem, updateItem, uncheckAllItems } = useDataContext()
+
     const [editItem, setEditItem] = useState<GroceryItem | undefined>(undefined)
-    const disableUncheck = !list.some((item) => item.checked)
+    const disableUncheck = !items.some((item) => item.checked)
     const textInputRef = useRef<HTMLInputElement>(null)
     const [filter, setFilter] = useState('')
 
-    const onSubmitListName = useCallback(
-        (itemName: string, color: string) => {
+    const onSubmitItem = useCallback(
+        (name: string, color: string) => {
             if (editItem) {
-                const newList = list.map((item) =>
-                    item.id === editItem.id
-                        ? { ...item, name: itemName, color }
-                        : item
-                )
-                setList(newList.toSorted(sortList))
+                const id = editItem.id
+                updateItem(id, name, color)
                 setEditItem(undefined)
             } else {
-                const newList = list.concat({
+                addItem({
                     id: generateShortUID(),
-                    name: itemName,
+                    name,
                     checked: false,
                     color,
                 })
-                setList(newList.toSorted(sortList))
             }
         },
-        [editItem, list, setList]
-    )
-
-    const onCheckChange = useCallback(
-        (id: string) => (e: ChangeEvent) => {
-            e.stopPropagation()
-            const newList = list
-                .map((item) =>
-                    item.id === id ? { ...item, checked: !item.checked } : item
-                )
-                .sort(sortList)
-            setList(newList)
-        },
-        [list, setList]
-    )
-
-    const onDeleteClick = useCallback(
-        (id: string, name: string) => (e: MouseEvent) => {
-            e.stopPropagation()
-            if (confirm(`Delete ${name} ?`)) {
-                const newList = list.filter((item) => item.id !== id)
-                setList(newList)
-            }
-        },
-        [list, setList]
+        [addItem, editItem, updateItem]
     )
 
     const onEditClick = useCallback(
         (id: string) => (e: MouseEvent) => {
             e.stopPropagation()
-            const item = list.find((item) => item.id === id)
+            const item = items.find((item) => item.id === id)
             if (!item) return
             setEditItem(item)
             setFilter(item.name)
             textInputRef.current?.scrollIntoView()
             textInputRef.current?.focus()
         },
-        [list, setList]
+        [items]
     )
 
     const onUncheckAllClick = useCallback(
         (e: MouseEvent) => {
             e.stopPropagation()
-            const newList = list
-                .map((item) => ({ ...item, checked: false }))
-                .sort(sortList)
-            setList(newList)
+            uncheckAllItems()
         },
-        [list, setList]
+        [uncheckAllItems]
     )
 
     const onTyping = useCallback((v: string) => {
         setFilter(v.toLocaleLowerCase())
     }, [])
 
-    const filteredList = list.filter((item) =>
-        item.name.toLocaleLowerCase().includes(filter)
+    const filteredList = items.filter((item) =>
+        item.name.toLocaleLowerCase()?.includes(filter)
     )
 
     return (
         <>
             <header>
                 <h1>{listName}</h1>
-                <a href="./" title="back to home" className="homeIcon">
+                <Link to="/" title="back to home" className={s.homeIcon}>
                     <HomeIcon
-                        className="icon"
+                        className={s.icon}
                         style={{
                             fill: 'grey',
                         }}
                     />
-                </a>
+                </Link>
             </header>
             <ItemForm
                 item={editItem}
-                onSubmitItem={onSubmitListName}
+                onSubmitItem={onSubmitItem}
                 onTyping={onTyping}
                 ref={textInputRef}
             />
-            <ul className="items">
+            <ul className={s.items}>
                 {filteredList.map((item) => (
-                    <li
+                    <ListItem
                         key={item.id}
-                        className={`item ${item.checked ? 'checked' : ''} `}
-                    >
-                        <input
-                            id={`checkbox-${item.id}`}
-                            type="checkbox"
-                            checked={item.checked}
-                            onChange={onCheckChange(item.id)}
-                        />
-                        <span
-                            className="color"
-                            style={{ backgroundColor: item.color }}
-                        ></span>
-                        <label
-                            htmlFor={`checkbox-${item.id}`}
-                            className="label"
-                        >
-                            {item.name}
-                        </label>
-                        <EditIcon
-                            className="icon"
-                            onClick={onEditClick(item.id)}
-                            style={{
-                                fill: 'grey',
-                            }}
-                        />
-                        <DeleteIcon
-                            className="icon"
-                            onClick={onDeleteClick(item.id, item.name)}
-                            style={{
-                                fill: 'grey',
-                            }}
-                        />
-                    </li>
+                        item={item}
+                        onEditClick={onEditClick}
+                    />
                 ))}
             </ul>
             {filter === '' && (
                 <p>
                     <button
-                        className="unckeckAll"
+                        className={s.unckeckAll}
                         disabled={disableUncheck}
                         onClick={onUncheckAllClick}
                     >

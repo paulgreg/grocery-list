@@ -1,5 +1,4 @@
 {
     "saveOnline": false,
-    "saveUrl": "https://some-server-url-to-allow-json-get-and-post",
-    "authorization": "user:password-encoded-in-base64"
+    "wsUrl": "ws://127.0.0.1:6010/ws"
 }

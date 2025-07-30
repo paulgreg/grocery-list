@@ -1,3 +1,4 @@
+import s from './ItemForm.module.css'
 import {
     useEffect,
     useCallback,
@@ -27,7 +28,7 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                 setItemName('')
                 onTyping('')
             },
-            [itemName, color]
+            [onSubmitItem, itemName, color, onTyping]
         )
 
         const onChange: ChangeEventHandler<HTMLInputElement> = useCallback(
@@ -36,7 +37,7 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                 setItemName(v)
                 onTyping(v)
             },
-            []
+            [onTyping]
         )
 
         useEffect(() => {
@@ -46,9 +47,10 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
             }
         }, [item])
         return (
-            <form className="ItemForm" onSubmit={onSubmitItemForm}>
+            <form className={s.ItemForm} onSubmit={onSubmitItemForm}>
                 <input
                     ref={textInputRef}
+                    className={s.ItemFormInput}
                     type="text"
                     placeholder="item"
                     required
@@ -59,7 +61,7 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                     onChange={onChange}
                 ></input>
                 <select
-                    className="colorChooser"
+                    className={s.colorChooser}
                     style={{ color, backgroundColor: color }}
                     onChange={(e) => setColor(e.target.value)}
                 >
@@ -76,7 +78,7 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                         </option>
                     ))}
                 </select>
-                <button>save</button>
+                <button className={s.ItemFormButton}>save</button>
             </form>
         )
     }

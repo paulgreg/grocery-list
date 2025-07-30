@@ -1,93 +1,72 @@
-import { useState, useEffect, useCallback, FormEvent } from 'react'
+import s from './Home.module.css'
+import { useEffect, useCallback, FormEvent, useRef, useMemo } from 'react'
 import settings from '../settings.json'
+import * as Y from 'yjs'
+import { WebsocketProvider } from 'y-websocket'
+import { PREFIX } from '../constants'
+import { IndexeddbPersistence } from 'y-indexeddb'
+import { useY } from 'react-yjs'
 
 type HomeProps = {
     onSubmitListName: (listName: string) => void
 }
+
 const LISTNAMES = 'listnames'
+const guid = `${PREFIX}:${LISTNAMES}`
 
 const Home: React.FC<HomeProps> = ({ onSubmitListName }) => {
-    const [listName, setListName] = useState('')
-    const [listNames, setListNames] = useState<Array<string>>([])
+    const inputRef = useRef<HTMLInputElement>(null)
+    const provider = useRef<WebsocketProvider>(null)
+    const persistence = useRef<IndexeddbPersistence>(null)
 
-    const loadListNames = useCallback(async () => {
-        if (!settings.saveOnline || !navigator.onLine)
-            return Promise.resolve([])
-        try {
-            const response = await fetch(
-                `${settings.saveUrl}/${LISTNAMES}.json`,
-                {
-                    headers: {
-                        Authorization: `Basic ${settings.authorization}`,
-                    },
-                }
-            )
-            if (response.ok) {
-                const json = await response.json()
-                return json as Array<string>
-            }
-            return Promise.resolve([])
-        } catch (e) {
-            console.error('error while loading listnames', e)
-            return Promise.resolve([])
-        }
-    }, [])
+    const yDoc = useMemo(() => new Y.Doc({ guid }), [])
+    const yListNames = yDoc.getArray<string>(`listNames`)
+    const listNames = useY(yListNames)
 
     useEffect(() => {
-        const load = async () => setListNames(await loadListNames())
-        if (!listName) load()
-    }, [listName, setListNames])
-
-    const addListNameOnline = useCallback(
-        async (listName: string) => {
-            if (!settings.saveOnline) return
-            if (listNames.includes(listName)) return
-            return fetch(`${settings.saveUrl}/add/${LISTNAMES}.json`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Basic ${settings.authorization}`,
-                },
-                body: JSON.stringify([listName]),
-            }).catch((e) => {
-                console.error('error while saving listname', e)
-            })
-        },
-        [listNames]
-    )
+        persistence.current = new IndexeddbPersistence(guid, yDoc)
+        if (settings.saveOnline && settings.wsUrl) {
+            provider.current = new WebsocketProvider(settings.wsUrl, guid, yDoc)
+            return () => provider.current?.disconnect()
+        }
+    }, [yDoc])
 
     const onSubmitListNameForm = useCallback(
         (e: FormEvent) => {
             e.preventDefault()
-            if (listName) {
-                addListNameOnline(listName)
-                onSubmitListName(listName)
+            const name = inputRef.current?.value ?? ''
+            if (name) {
+                if (!listNames.includes(name)) {
+                    yListNames.insert(0, [name])
+                }
+                onSubmitListName(name)
             }
         },
-        [listName, addListNameOnline]
+        [listNames, onSubmitListName, yListNames]
     )
 
     return (
         <>
             <h1>Grocery list</h1>
-            <form className="ListNameForm" onSubmit={onSubmitListNameForm}>
+            <form className={s.ListNameForm} onSubmit={onSubmitListNameForm}>
                 <datalist id="data-listnames">
-                    {listNames.map((name) => (
+                    {listNames?.map((name) => (
                         <option value={name} key={name}>
                             {name}
                         </option>
                     ))}
                 </datalist>
                 <input
+                    ref={inputRef}
                     type="text"
+                    name="name"
+                    className={s.ListNameFormInput}
                     placeholder="market"
                     list="data-listnames"
                     required
                     autoFocus
                     minLength={2}
                     maxLength={20}
-                    value={listName}
-                    onChange={(e) => setListName(e.target.value)}
                 ></input>
                 <button>go</button>
             </form>
