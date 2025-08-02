@@ -1,8 +1,12 @@
 # Grocery list
 
-A simple web app to handle grocery lists.
+A [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) grocery-list web app using [YJS](https://docs.yjs.dev/).
 
-You can try the app here : https://paulgreg.me/grocery-list/ (but I strongly suggest you to host it yourself).
+You can try the app here : https://paulgreg.me/grocery-list/ but with local storage only.
+
+It is designed to be used with [y-websocket](https://www.npmjs.com/package/y-websocket).
+
+I’ve made a launcher project here : [paulgreg/yjs-server](https://github.com/paulgreg/yjs-server)
 
 ## Settings
 
