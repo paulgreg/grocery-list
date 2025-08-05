@@ -26,7 +26,8 @@ const deleteList = async (docName: string) => {
     return false
 }
 
-const formatRawListName = (rawDocName = '') => rawDocName.split(`${PREFIX}:`)[1]
+const formatRawListName = (rawDocName = '') =>
+    decodeURIComponent(rawDocName.split(`${PREFIX}:`)[1])
 
 const Home = () => {
     const [rawListNames, setRawListNames] = useState([])
