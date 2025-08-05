@@ -35,7 +35,8 @@ const DataContextProvider: React.FC<DataContextProviderPropsType> = ({
             provider.current = new WebsocketProvider(
                 settings.crdtUrl,
                 guid,
-                yDoc
+                yDoc,
+                { params: { secret: settings.secret } }
             )
             return () => provider.current?.disconnect()
         }
