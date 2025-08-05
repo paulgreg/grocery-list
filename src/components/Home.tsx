@@ -13,14 +13,14 @@ import settings from '../settings.json'
 import { PREFIX } from '../constants'
 
 const requestRawListNames = async () => {
-    const url = `${settings.apiUrl}list?prefix=${PREFIX}`
+    const url = `${settings.crdtUrl}list?prefix=${PREFIX}`
     const response = await fetch(url)
     if (response.ok) return await response.json()
     return []
 }
 
 const deleteList = async (docName: string) => {
-    const url = `${settings.apiUrl}del?doc=${docName}`
+    const url = `${settings.crdtUrl}del?doc=${docName}`
     const response = await fetch(url)
     if (response.ok) return await response.json()
     return false
