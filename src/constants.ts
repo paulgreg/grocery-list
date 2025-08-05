@@ -1,4 +1,4 @@
-export const PREFIX = 'gl:'
+export const PREFIX = 'gl'
 
 export const COLORS = [
     'orange',

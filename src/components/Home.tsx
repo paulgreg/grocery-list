@@ -1,69 +1,66 @@
 import s from './Home.module.css'
 import {
-    useEffect,
     useCallback,
     FormEvent,
     useRef,
-    useMemo,
     MouseEvent,
+    useState,
+    useEffect,
 } from 'react'
-import settings from '../settings.json'
-import * as Y from 'yjs'
-import { WebsocketProvider } from 'y-websocket'
-import { PREFIX } from '../constants'
-import { IndexeddbPersistence } from 'y-indexeddb'
-import { useY } from 'react-yjs'
 import { Link, useNavigate } from 'react-router-dom'
 import DeleteIcon from '../assets/close.svg?react'
+import settings from '../settings.json'
+import { PREFIX } from '../constants'
 
-const LISTNAMES = 'listnames'
-const guid = `${PREFIX}:${LISTNAMES}`
+const requestRawListNames = async () => {
+    const url = `${settings.apiUrl}list?prefix=${PREFIX}`
+    const response = await fetch(url)
+    if (response.ok) return await response.json()
+    return []
+}
+
+const deleteList = async (docName: string) => {
+    const url = `${settings.apiUrl}del?doc=${docName}`
+    const response = await fetch(url)
+    if (response.ok) return await response.json()
+    return false
+}
+
+const formatRawListName = (rawDocName = '') => rawDocName.split(`${PREFIX}:`)[1]
 
 const Home = () => {
+    const [rawListNames, setRawListNames] = useState([])
     const inputRef = useRef<HTMLInputElement>(null)
-    const provider = useRef<WebsocketProvider>(null)
-    const persistence = useRef<IndexeddbPersistence>(null)
-
-    const yDoc = useMemo(() => new Y.Doc({ guid }), [])
-    const yListNames = yDoc.getArray<string>(`listNames`)
-    const listNames = useY(yListNames)
 
     const navigate = useNavigate()
 
+    const fillListNames = async () => {
+        setRawListNames(await requestRawListNames())
+    }
+
     useEffect(() => {
-        persistence.current = new IndexeddbPersistence(guid, yDoc)
-        if (settings.saveOnline && settings.wsUrl) {
-            provider.current = new WebsocketProvider(settings.wsUrl, guid, yDoc)
-            return () => provider.current?.disconnect()
-        }
-    }, [yDoc])
+        if (settings.saveOnline) fillListNames()
+    }, [])
 
     const onSubmitListNameForm = useCallback(
         (e: FormEvent) => {
             e.preventDefault()
             const name = inputRef.current?.value ?? ''
             if (name) {
-                const idx = yListNames.toArray().findIndex((n) => n === name)
-                if (idx !== -1) {
-                    yListNames.delete(idx)
-                }
-                yListNames.insert(0, [name])
                 navigate(`/list/${name}`)
             }
         },
-        [navigate, yListNames]
+        [navigate]
     )
     const onDeleteList = useCallback(
-        (name: string) => (e: MouseEvent) => {
+        (rawName: string) => (e: MouseEvent) => {
             e.preventDefault()
-            if (confirm(`delete ${name} ?`)) {
-                const idx = yListNames
-                    .toArray()
-                    .findIndex((listName) => listName === name)
-                yListNames.delete(idx, 1)
+            if (confirm(`delete ${formatRawListName(rawName)} ?`)) {
+                deleteList(rawName)
+                fillListNames()
             }
         },
-        [yListNames]
+        []
     )
 
     return (
@@ -84,11 +81,14 @@ const Home = () => {
                 <button>go</button>
             </form>
             <ul className={s.list}>
-                {listNames?.map((name) => (
+                {rawListNames?.map((name) => (
                     <li key={name} className={s.listItem}>
                         <span className={s.listContainer}>
-                            <Link to={`/list/${name}`} className={s.listLink}>
-                                {name}
+                            <Link
+                                to={`/list/${formatRawListName(name)}`}
+                                className={s.listLink}
+                            >
+                                {formatRawListName(name)}
                             </Link>
                             <button
                                 className={s.button}
