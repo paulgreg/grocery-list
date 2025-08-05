@@ -35,11 +35,13 @@ const Home = () => {
     const navigate = useNavigate()
 
     const fillListNames = async () => {
-        setRawListNames(await requestRawListNames())
+        if (settings.saveOnline) {
+            setRawListNames(await requestRawListNames())
+        }
     }
 
     useEffect(() => {
-        if (settings.saveOnline) fillListNames()
+        fillListNames()
     }, [])
 
     const onSubmitListNameForm = useCallback(
