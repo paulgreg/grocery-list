@@ -1,4 +1,5 @@
 {
     "saveOnline": false,
-    "crdtUrl": "ws://127.0.0.1:6010/"
+    "crdtUrl": "ws://127.0.0.1:6010/",
+    "secret": "random-string"
 }
