@@ -6,8 +6,9 @@ import { WebsocketProvider } from 'y-websocket'
 import settings from './settings.json'
 import { GroceryItem, GroceryItems } from './types'
 import { useY } from 'react-yjs'
-import { slugify, sortList } from './utils'
+import { sortList } from './utils'
 import { DataContext } from './DataContext'
+import { slugify } from './string'
 
 interface DataContextProviderPropsType {
     listName: string
