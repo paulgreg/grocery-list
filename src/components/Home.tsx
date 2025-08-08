@@ -13,7 +13,7 @@ import settings from '../settings.json'
 import { PREFIX } from '../constants'
 import { formatRawListName } from '../string'
 
-const requestRawListNames = async () => {
+const requestRawListNames = async (): Promise<string[]> => {
     const url = `${settings.crdtUrl}list?prefix=${PREFIX}&secret=${settings.secret}`
     const response = await fetch(url)
     if (response.ok) return await response.json()
@@ -52,14 +52,15 @@ const HomeItem: React.FC<HomeItemProps> = ({ name, onDeleteList }) => {
 }
 
 const Home = () => {
-    const [rawListNames, setRawListNames] = useState([])
+    const [rawListNames, setRawListNames] = useState<string[]>([])
     const inputRef = useRef<HTMLInputElement>(null)
 
     const navigate = useNavigate()
 
     const fillListNames = async () => {
         if (settings.saveOnline) {
-            setRawListNames(await requestRawListNames())
+            const lists = await requestRawListNames()
+            setRawListNames(lists.toSorted((a, b) => a.localeCompare(b)))
         }
     }
 
