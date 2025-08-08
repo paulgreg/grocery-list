@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import DeleteIcon from '../assets/close.svg?react'
 import settings from '../settings.json'
 import { PREFIX } from '../constants'
+import { formatRawListName } from '../string'
 
 const requestRawListNames = async () => {
     const url = `${settings.crdtUrl}list?prefix=${PREFIX}&secret=${settings.secret}`
@@ -26,8 +27,29 @@ const deleteList = async (docName: string) => {
     return false
 }
 
-const formatRawListName = (rawDocName = '') =>
-    decodeURIComponent(rawDocName.split(`${PREFIX}:`)[1])
+type HomeItemProps = {
+    name: string
+    onDeleteList: (rawName: string) => (e: MouseEvent) => void
+}
+const HomeItem: React.FC<HomeItemProps> = ({ name, onDeleteList }) => {
+    const formatedName = formatRawListName(name)
+    return (
+        <li key={name} className={s.listItem}>
+            <span className={s.listContainer}>
+                <Link to={`/list/${formatedName}`} className={s.listLink}>
+                    {formatedName}
+                </Link>
+                <button className={s.button} onClick={onDeleteList(name)}>
+                    <DeleteIcon
+                        style={{
+                            fill: 'grey',
+                        }}
+                    />
+                </button>
+            </span>
+        </li>
+    )
+}
 
 const Home = () => {
     const [rawListNames, setRawListNames] = useState([])
@@ -85,26 +107,11 @@ const Home = () => {
             </form>
             <ul className={s.list}>
                 {rawListNames?.map((name) => (
-                    <li key={name} className={s.listItem}>
-                        <span className={s.listContainer}>
-                            <Link
-                                to={`/list/${formatRawListName(name)}`}
-                                className={s.listLink}
-                            >
-                                {formatRawListName(name)}
-                            </Link>
-                            <button
-                                className={s.button}
-                                onClick={onDeleteList(name)}
-                            >
-                                <DeleteIcon
-                                    style={{
-                                        fill: 'grey',
-                                    }}
-                                />
-                            </button>
-                        </span>
-                    </li>
+                    <HomeItem
+                        key={name}
+                        name={name}
+                        onDeleteList={onDeleteList}
+                    />
                 ))}
             </ul>
         </>
