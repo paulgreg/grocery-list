@@ -31,6 +31,11 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
             [onSubmitItem, itemName, color, onTyping]
         )
 
+        const onClearClick = useCallback(() => {
+            setItemName('')
+            onTyping('')
+        }, [onTyping])
+
         const onChange: ChangeEventHandler<HTMLInputElement> = useCallback(
             (e) => {
                 const v = e.target.value
@@ -46,6 +51,9 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                 setColor(item.color)
             }
         }, [item])
+
+        const disabled = itemName.length === 0
+
         return (
             <form className={s.ItemForm} onSubmit={onSubmitItemForm}>
                 <input
@@ -78,7 +86,17 @@ const ItemForm = forwardRef<HTMLInputElement, FormItemProps>(
                         </option>
                     ))}
                 </select>
-                <button className={s.ItemFormButton}>save</button>
+                <button className={s.ItemFormButton} disabled={disabled}>
+                    ✅
+                </button>
+                <button
+                    className={s.ItemFormButton}
+                    onClick={onClearClick}
+                    disabled={disabled}
+                    title="clear"
+                >
+                    ❌
+                </button>
             </form>
         )
     }
