@@ -10,16 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hocuspocus/provider": "^4.0.0",
     "classnames": "^2.5.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
     "react-yjs": "^2.0.1",
     "y-indexeddb": "^9.0.12",
-    "y-websocket": "^3.0.0",
     "yjs": "^13.6.30"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

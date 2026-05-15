@@ -4,7 +4,7 @@ A [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) groce
 
 You can try the app here : https://paulgreg.me/grocery-list/ but with local storage only.
 
-It is designed to be used with [paulgreg/y-websocket-service](https://github.com/paulgreg/y-websocket-service) for client synchronisation.
+It is designed to be used with [paulgreg/yjs-hocuspocus](https://github.com/paulgreg/yjs-hocuspocus) for client synchronisation.
 
 ## Configuration
 
